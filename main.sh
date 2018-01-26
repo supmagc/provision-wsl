@@ -18,6 +18,7 @@ function add_config_line {
 
 # Release upgrade
 # apt-mark hold procps strace sudo bash
+apt-mark hold bash
 add_config_line "/etc/update-manager/release-upgrades" 'Prompt=normal'
 RELEASE_UPGRADER_NO_SCREEN=1 do-release-upgrade
 
