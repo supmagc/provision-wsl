@@ -10,6 +10,7 @@ antigen bundle history
 antigen bundle command-not-found
 
 # Theme
+DEFAULT_USER=$USER
 POWERLEVEL9K_INSTALLATION_PATH=$ANTIGEN_BUNDLES/bhilburn/powerlevel9k
 antigen theme bhilburn/powerlevel9k powerlevel9k
 
