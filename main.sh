@@ -61,8 +61,16 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
 mkdir -p -v $HOME/.config
 cp -v -R ./shellconfig/* $HOME/.config
 
+# Fix ownership
 chown -R $SUDO_USER:$SUDO_USER "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
 chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
+
+# Configure git
+git config --global user.email "supmagc@gmail.com"
+git config --global user.name "Jelle Voet"
+git config --global push.default current
+git config --global core.autocrlf false
+git config --global core.filemode false
 
 # Switch to zsh
 zsh
