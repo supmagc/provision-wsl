@@ -16,6 +16,24 @@ function add_config_line {
   echo "$ACL_LINE" >> "$ACL_FILE"
 }
 
+function request_variable {
+  local VAR_NAME="$1"
+  local VAR_DEFAULT_NAME="DEFAULT_$VAR_NAME"
+  local VAR_DESCRIPTION="$2"
+  read -p "What is your $VAR_DESCRIPTION [default: ${!VAR_DEFAULT_NAME}]? " VAR
+  if [[ -z "$VAR" ]]; then VAR="${!VAR_DEFAULT_NAME}"; fi
+  eval "$VAR_DEFAULT_NAME=\"$VAR\""
+  eval "$VAR_NAME=\"$VAR\""
+}
+
+source "$HOME/.config/config.default.zsh"
+request_variable "SSH_KEYS" "directory where putty ssh keys are located"
+
+echo "#User specified overrides for WSL configuration" > ~/.config/config.user.zsh
+for i in ${!DEFAULT_*}; do
+  echo "$i=\"${!i}\"" >> ~/.config/config.user.zsh
+done
+
 # Release upgrade
 # apt-mark hold procps strace sudo bash
 apt-mark hold bash
@@ -57,6 +75,7 @@ add_config_line "$HOME/.profile" 'if test -t 1; then exec zsh; fi'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/antigen.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/aliasloading.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
+add_config_line "$HOME/.config/config.user.zsh" 'source "$HOME/.config/config.user.zsh"'
 
 # Copy config files
 mkdir -p -v $HOME/.config
