@@ -1,5 +1,5 @@
-if [[ ! -f ~/.aliases ]]; then
-  touch ~/.aliases
+if [[ ! -f "$HOME/.aliases" ]]; then
+  touch "$HOME/.aliases"
 fi
 
-source "~/.aliases"
+source "$HOME/.aliases"
