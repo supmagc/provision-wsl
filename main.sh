@@ -24,7 +24,7 @@ echo "Prompt=normal" >> "/etc/update-manager/release-upgrades"
 RELEASE_UPGRADER_NO_SCREEN=1 do-release-upgrade
 
 # Locale fix
-gunzip --keep /usr/share/i18n/charmaps/UTF-8.gz
+gunzip --keep --force /usr/share/i18n/charmaps/UTF-8.gz
 dpkg-reconfigure --frontend=noninteractive locales
 
 # Configure repo availability for git(-lfs)
