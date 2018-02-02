@@ -20,22 +20,30 @@ function request_variable {
   local VAR_NAME="$1"
   local VAR_DEFAULT_NAME="DEFAULT_$VAR_NAME"
   local VAR_DESCRIPTION="$2"
-  read -p "What is your $VAR_DESCRIPTION [default: ${!VAR_DEFAULT_NAME}]? " VAR
-  if [[ -z "$VAR" ]]; then VAR="${!VAR_DEFAULT_NAME}"; fi
+  local VAR_DEFAULT=${!VAR_NAME-${!VAR_DEFAULT_NAME}}
+  read -p "What is your $VAR_DESCRIPTION [default: $VAR_DEFAULT]? " VAR
+  if [[ -z "$VAR" ]]; then VAR="$VAR_DEFAULT"; fi
   eval "$VAR_DEFAULT_NAME=\"$VAR\""
   eval "$VAR_NAME=\"$VAR\""
 }
 
-source "$HOME/.config/config.default.zsh"
+source "./installconfig/config.default.zsh"
+if [[ -f "$HOME/.config/config.user.zsh" ]]; then
+  source "$HOME/.config/config.user.zsh"
+else
+  cp -v "installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
+fi
+
 request_variable "SSH_KEYS" "directory where putty ssh keys are located"
 
 echo "#User specified overrides for WSL configuration" > ~/.config/config.user.zsh
 for i in ${!DEFAULT_*}; do
-  echo "$i=\"${!i}\"" >> ~/.config/config.user.zsh
+  echo "${i:8}=\"${!i}\"" >> ~/.config/config.user.zsh
 done
 
+exit
+
 # Release upgrade
-# apt-mark hold procps strace sudo bash
 apt-mark hold bash
 sed -i "/Prompt.*$/d" "/etc/update-manager/release-upgrades"
 echo "Prompt=normal" >> "/etc/update-manager/release-upgrades"
