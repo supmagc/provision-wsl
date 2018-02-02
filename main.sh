@@ -41,8 +41,6 @@ for i in ${!DEFAULT_*}; do
   echo "${i:8}=\"${!i}\"" >> ~/.config/config.user.zsh
 done
 
-exit
-
 # Release upgrade
 apt-mark hold bash
 sed -i "/Prompt.*$/d" "/etc/update-manager/release-upgrades"
@@ -83,7 +81,7 @@ add_config_line "$HOME/.profile" 'if test -t 1; then exec zsh; fi'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/antigen.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/aliasloading.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
-add_config_line "$HOME/.config/config.user.zsh" 'source "$HOME/.config/config.user.zsh"'
+add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 
 # Copy config files
 mkdir -p -v $HOME/.config
