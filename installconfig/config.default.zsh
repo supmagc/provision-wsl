@@ -1,1 +1,3 @@
 DEFAULT_SSH_KEYS="/mnt/c/Users/<USERNAME>/<PATH>"
+DEFAULT_GIT_USER="Git Username"
+DEFAULT_GIT_MAIL="git@mail.be"

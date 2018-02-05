@@ -1,9 +1,17 @@
 #!/bin/bash
 
+######################################################################
+# init checks
+######################################################################
+
 if [[ $(id -u) -ne 0 ]]; then
   echo "WSL main.sh must be run as root"
   exit
 fi
+
+######################################################################
+# Functions
+######################################################################
 
 function add_config_line {
   local ACL_FILE="$1"
@@ -27,19 +35,24 @@ function request_variable {
   eval "$VAR_NAME=\"$VAR\""
 }
 
+######################################################################
+# Run as root
+######################################################################
+
+# Create the config directory as user
+sudo -u ${SUDO_USER-${USER}} mkdir -p -v $HOME/.config
+
+# Assure default configuration is loaded and user configuration exists
 source "./installconfig/config.default.zsh"
 if [[ -f "$HOME/.config/config.user.zsh" ]]; then
   source "$HOME/.config/config.user.zsh"
 else
-  cp -v "installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
+  sudo -u ${SUDO_USER-${USER}} cp -v "./installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
 fi
 
 request_variable "SSH_KEYS" "directory where putty ssh keys are located"
-
-echo "#User specified overrides for WSL configuration" > ~/.config/config.user.zsh
-for i in ${!DEFAULT_*}; do
-  echo "${i:8}=\"${!i}\"" >> ~/.config/config.user.zsh
-done
+request_variable "GIT_USER" "git username"
+request_variable "GIT_MAIL" "git e-mail"
 
 # Release upgrade
 apt-mark hold bash
@@ -69,6 +82,18 @@ apt-get install -y \
 apt-get upgrade -y
 apt-get autoremove -y
 
+######################################################################
+# Run as normal user
+######################################################################
+
+# Drop to default user
+su ${SUDO_USER-${USER}}
+
+echo "#User specified overrides for WSL configuration" > ~/.config/config.user.zsh
+for i in ${!DEFAULT_*}; do
+  echo "${i:8}=\"${!i}\"" >> ~/.config/config.user.zsh
+done
+
 # Install or update antigen
 if [[ ! -d $HOME/.antigen ]]; then
   git clone https://github.com/zsh-users/antigen.git $HOME/.antigen
@@ -84,16 +109,15 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 
 # Copy config files
-mkdir -p -v $HOME/.config
 cp -v -R ./shellconfig/* $HOME/.config
 
 # Fix ownership
-chown -R $SUDO_USER:$SUDO_USER "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
-chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
+#chown -R $SUDO_USER:$SUDO_USER "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
+#chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
 
 # Configure git
-git config --global user.email "supmagc@gmail.com"
-git config --global user.name "Jelle Voet"
+git config --global user.email "$GIT_MAIL"
+git config --global user.name "$GIT_USER"
 git config --global push.default current
 git config --global core.autocrlf false
 git config --global core.filemode false
