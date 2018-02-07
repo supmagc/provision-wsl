@@ -114,9 +114,6 @@ git config --global push.default current
 git config --global core.autocrlf false
 git config --global core.filemode false
 
-# Switch to zsh
-# zsh
-
 # Update antigen
 zsh -i -c 'antigen update'
 zsh -i -c 'antigen cache-gen'
@@ -128,3 +125,6 @@ zsh -i -c 'antigen cache-gen'
 # Fix ownership
 chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
 chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+
+# Final text
+echo "You might need to retsart your shell for all changes to have an impact"
