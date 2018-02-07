@@ -40,14 +40,14 @@ function request_variable {
 ######################################################################
 
 # Create the config directory as user
-sudo -u ${SUDO_USER-${USER}} mkdir -p -v $HOME/.config
+mkdir -p -v $HOME/.config
 
 # Assure default configuration is loaded and user configuration exists
 source "./installconfig/config.default.zsh"
 if [[ -f "$HOME/.config/config.user.zsh" ]]; then
   source "$HOME/.config/config.user.zsh"
 else
-  sudo -u ${SUDO_USER-${USER}} cp -v "./installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
+  cp -v "./installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
 fi
 
 request_variable "SSH_KEYS" "directory where putty ssh keys are located"
@@ -82,13 +82,6 @@ apt-get install -y \
 apt-get upgrade -y
 apt-get autoremove -y
 
-######################################################################
-# Run as normal user
-######################################################################
-
-# Drop to default user
-su ${SUDO_USER-${USER}}
-
 echo "#User specified overrides for WSL configuration" > ~/.config/config.user.zsh
 for i in ${!DEFAULT_*}; do
   echo "${i:8}=\"${!i}\"" >> ~/.config/config.user.zsh
@@ -111,10 +104,6 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 # Copy config files
 cp -v -R ./shellconfig/* $HOME/.config
 
-# Fix ownership
-#chown -R $SUDO_USER:$SUDO_USER "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
-#chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config"
-
 # Configure git
 git config --global user.email "$GIT_MAIL"
 git config --global user.name "$GIT_USER"
@@ -123,8 +112,16 @@ git config --global core.autocrlf false
 git config --global core.filemode false
 
 # Switch to zsh
-zsh
+# zsh
 
 # Update antigen
-antigen update
-antigen cache-gen
+zsh -i -c 'antigen update'
+zsh -i -c 'antigen cache-gen'
+
+######################################################################
+# Fix permissions on all script linked to provisioning in user directory
+######################################################################
+
+# Fix ownership
+chown -R $SUDO_USER:$SUDO_USER "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
