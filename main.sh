@@ -98,6 +98,7 @@ else
 fi
 
 # Change config-files
+add_config_line "$HOME/.profile" 'umask 002'
 add_config_line "$HOME/.profile" 'if test -t 1; then exec zsh; fi'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/antigen.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/aliasloading.zsh"'
