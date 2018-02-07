@@ -39,15 +39,18 @@ function request_variable {
 # Run as root
 ######################################################################
 
+SRC="$(dirname $(realpath $0))"
+USR=${SUDO_USER-${USER}}
+
 # Create the config directory as user
 mkdir -p -v $HOME/.config
 
 # Assure default configuration is loaded and user configuration exists
-source "./installconfig/config.default.zsh"
+source "$SRC/installconfig/config.default.zsh"
 if [[ -f "$HOME/.config/config.user.zsh" ]]; then
   source "$HOME/.config/config.user.zsh"
 else
-  cp -v "./installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
+  cp -v "$SRC/installconfig/config.default.zsh" "$HOME/.config/config.user.zsh"
 fi
 
 request_variable "SSH_KEYS" "directory where putty ssh keys are located"
@@ -82,9 +85,9 @@ apt-get install -y \
 apt-get upgrade -y
 apt-get autoremove -y
 
-echo "#User specified overrides for WSL configuration" > ~/.config/config.user.zsh
+echo "#User specified overrides for WSL configuration" > $HOME/.config/config.user.zsh
 for i in ${!DEFAULT_*}; do
-  echo "${i:8}=\"${!i}\"" >> ~/.config/config.user.zsh
+  echo "${i:8}=\"${!i}\"" >> $HOME/.config/config.user.zsh
 done
 
 # Install or update antigen
@@ -102,7 +105,7 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 
 # Copy config files
-cp -v -R ./shellconfig/* $HOME/.config
+cp -v -R "$SRC/shellconfig" "$HOME/"
 
 # Configure git
 git config --global user.email "$GIT_MAIL"
@@ -123,5 +126,5 @@ zsh -i -c 'antigen cache-gen'
 ######################################################################
 
 # Fix ownership
-chown -R $SUDO_USER:$SUDO_USER "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
 chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
