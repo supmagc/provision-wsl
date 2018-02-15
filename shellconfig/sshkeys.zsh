@@ -10,7 +10,9 @@ if [[ ! -z "$SSH_KEYS" ]]; then
     else
       TARGET="id_rsa_${FILE/%.ppk/}"
     fi
+    puttygen "$X" -L > "$HOME/.ssh/$TARGET.pub"
     puttygen "$X" -O private-openssh -o "$HOME/.ssh/$TARGET"
+    chmod 0644 "$HOME/.ssh/$TARGET.pub"
     chmod 0600 "$HOME/.ssh/$TARGET"
   done;
 fi
