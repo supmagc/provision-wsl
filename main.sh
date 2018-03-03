@@ -106,7 +106,7 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 
 # Copy config files
-cp -v -R "$SRC/shellconfig" "$HOME/"
+cp -v -R "$SRC/shellconfig/*" "$HOME/.config"
 
 # Configure git
 git config --global user.email "$GIT_MAIL"
