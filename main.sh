@@ -108,10 +108,6 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 # Copy config files
 cp -v -R "$SRC/shellconfig/"* "$HOME/.config/"
 
-# Fix ownership and permissions on all script linked to provisioning in user directory
-chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
-chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
-
 # Configure git
 git config --global user.email "$GIT_MAIL"
 git config --global user.name "$GIT_USER"
@@ -119,9 +115,13 @@ git config --global push.default current
 git config --global core.autocrlf false
 git config --global core.filemode false
 
+# Fix ownership and permissions on all script linked to provisioning in user directory
+chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+
 # Update antigen
-zsh -i -c 'antigen update'
-zsh -i -c 'antigen cache-gen'
+sudo -u $USR zsh -i -c 'antigen update'
+sudo -u $USR zsh -i -c 'antigen cache-gen'
 
 # Final text
-echo "You might need to retsart your shell for all changes to have an impact"
+echo "You might need to restart your shell for all changes to have an impact"
