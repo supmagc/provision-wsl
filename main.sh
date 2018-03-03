@@ -42,8 +42,9 @@ function request_variable {
 SRC="$(dirname $(realpath $0))"
 USR=${SUDO_USER-${USER}}
 
-# Create the config directory as user
-mkdir -p -v $HOME/.config
+# Create the required directories and files
+mkdir -p -v $HOME/.config $HOME/.ssh
+touch $HOME/.gitconfig
 
 # Assure default configuration is loaded and user configuration exists
 source "$SRC/installconfig/config.default.zsh"
@@ -97,6 +98,13 @@ else
   git -C $HOME/.antigen pull
 fi
 
+# Copy config files
+cp -v -R "$SRC/shellconfig/"* "$HOME/.config/"
+
+# Fix ownership and permissions on all script linked to provisioning in user directory
+chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
+
 # Change config-files
 add_config_line "$HOME/.profile" 'umask 002'
 add_config_line "$HOME/.profile" 'if test -t 1; then exec zsh; fi'
@@ -105,19 +113,12 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/aliasloading.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 
-# Copy config files
-cp -v -R "$SRC/shellconfig/"* "$HOME/.config/"
-
 # Configure git
 git config --global user.email "$GIT_MAIL"
 git config --global user.name "$GIT_USER"
 git config --global push.default current
 git config --global core.autocrlf false
 git config --global core.filemode false
-
-# Fix ownership and permissions on all script linked to provisioning in user directory
-chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
-chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
 
 # Update antigen
 sudo -u $USR zsh -i -c 'antigen update'
