@@ -43,8 +43,7 @@ SRC="$(dirname $(realpath $0))"
 USR=${SUDO_USER-${USER}}
 
 # Create the required directories and files
-mkdir -p -v $HOME/.config $HOME/.ssh
-touch $HOME/.gitconfig
+mkdir -p -v $HOME/.config
 
 # Assure default configuration is loaded and user configuration exists
 source "$SRC/installconfig/config.default.zsh"
@@ -65,8 +64,9 @@ echo "Prompt=normal" >> "/etc/update-manager/release-upgrades"
 RELEASE_UPGRADER_NO_SCREEN=1 do-release-upgrade
 
 # Locale fix
-gunzip --keep --force /usr/share/i18n/charmaps/UTF-8.gz
 dpkg-reconfigure --frontend=noninteractive locales
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 # Configure repo availability for git(-lfs)
 add-apt-repository ppa:git-core/ppa -y
@@ -105,6 +105,10 @@ cp -v -R "$SRC/shellconfig/"* "$HOME/.config/"
 chown -R $USR:$USR "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
 chmod -R go-w "$HOME/.zshrc" "$HOME/.profile" "$HOME/.antigen" "$HOME/.config" "$HOME/.ssh" "$HOME/.gitconfig"
 
+######################################################################
+# Run as user
+######################################################################
+
 # Change config-files
 add_config_line "$HOME/.profile" 'umask 002'
 add_config_line "$HOME/.profile" 'if test -t 1; then exec zsh; fi'
@@ -113,12 +117,15 @@ add_config_line "$HOME/.zshrc" 'source "$HOME/.config/aliasloading.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/sshkeys.zsh"'
 add_config_line "$HOME/.zshrc" 'source "$HOME/.config/config.user.zsh"'
 
+# Make userdir/files
+sudo -u $USR mkdir -p -v $HOME/.ssh
+
 # Configure git
-git config --global user.email "$GIT_MAIL"
-git config --global user.name "$GIT_USER"
-git config --global push.default current
-git config --global core.autocrlf false
-git config --global core.filemode false
+sudo -u $USR git config --global user.email "$GIT_MAIL"
+sudo -u $USR git config --global user.name "$GIT_USER"
+sudo -u $USR git config --global push.default current
+sudo -u $USR git config --global core.autocrlf false
+sudo -u $USR git config --global core.filemode false
 
 # Update antigen
 sudo -u $USR zsh -i -c 'antigen update'
